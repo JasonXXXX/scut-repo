@@ -1,5 +1,9 @@
-*
-003demos/!**/*.py
-003demos/!**/*.record
-003demos/!**/events*
+003demos/**/*.pbtxt
+003demos/**/model*
+003demos/**/*.png
+003demos/**/*.PNG
+003demos/**/*.jpg
+003demos/**/*.JPG
+003demos/**/*.jpeg
+003demos/**/*.JPEG
 !.gitignore
