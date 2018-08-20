@@ -1,3 +1,4 @@
+003demos/*
 003demos/!**/*.py
 003demos/!**/*.record
 003demos/!**/events*
