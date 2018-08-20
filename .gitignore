@@ -1,7 +1,7 @@
 003demos/*
-!*.py
-!*.record
-!events*
+!003demos/**/*.py
+!003demos/**/*.record
+!003demos/**/events*
 !*.md
 !LICENSE
 !.gitignore
