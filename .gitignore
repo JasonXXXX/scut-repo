@@ -1,0 +1,7 @@
+003demos/*
+!*.py
+!*.record
+!events*
+!*.md
+!LICENSE
+!.gitignore
