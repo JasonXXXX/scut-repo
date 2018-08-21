@@ -27,7 +27,7 @@ def main(_):
         epoch = 4000
         num_samples = 60000
         batch_size = 64
-        record_path = './records/mnist_28x28_60000.record'
+        record_path = './records/mnist_28x28_60000.record' if not FLAGS.noise else ('./records/mnist_28x28_noise%s_60000.record' % FLAGS.noise)
     elif log == 'usps':
         epoch = 4000
         num_samples = 500
@@ -38,7 +38,7 @@ def main(_):
         batch_size = 64
         record_path = './records/both_28x28_60500.record' if not FLAGS.noise else ('./records/both_28x28_noise%s_60500.record' % FLAGS.noise)
     elif log == 'steps':
-        epoch = 800 # 因为这里只是训练最后的全连接层，所以训练次数不用太多
+        epoch = 1000 # 因为这里只是训练最后的全连接层，所以训练次数不用太多
         num_samples = 500
         record_path = './records/usps_28x28_500.record'
         is_training = False # 冻结 resnet 的层，只训练最后一层的全连接层

@@ -99,18 +99,13 @@ def generate_tfrecord(image_paths, output_path):
 
 
 def main(_):
-    images_record_path = './records/both_28x28_noise20_60500.record'
+    images_record_path = './records/mnist_28x28_noise20_60000.record'
 
     images_path = '../datasets/mnist/train28-noise20'
     mnist_paths = [images_path + '/' + path for path in os.listdir(images_path)]
 
-    images_path = '../datasets/usps/train'
-    usps_paths = [images_path + '/' + path for path in os.listdir(images_path)]
-
-    usps_paths.extend(mnist_paths)
-
-    random.shuffle(usps_paths)
-    generate_tfrecord(usps_paths, images_record_path)
+    random.shuffle(mnist_paths)
+    generate_tfrecord(mnist_paths, images_record_path)
 
 
 if __name__ == '__main__':
