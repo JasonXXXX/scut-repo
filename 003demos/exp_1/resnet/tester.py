@@ -57,10 +57,6 @@ def main(_):
         # 'eval/Recall@5': slim.metrics.streaming_recall_at_k(logits, labels, 5),
     })
 
-    checkpoint_path_latest = tf.train.latest_checkpoint(checkpoint_path)
-    print(checkpoint_path_latest, 'found.')
-    sys.stdout.flush()
-
     # evaluate the model with data from record file
     tf.train.get_or_create_global_step()
     metric_values = slim.evaluation.evaluation_loop(master='',
@@ -69,9 +65,10 @@ def main(_):
                                         num_evals=5,
                                         max_number_of_evaluations=6000,
                                         eval_interval_secs=40,
-                                        eval_op=names_to_updates.values(),
+                                        # eval_op=names_to_updates.values(),
                                         summary_op=tf.summary.merge(summary_ops),
-                                        final_op=names_to_values)
+                                        # final_op=names_to_values
+    )
     names_to_values = dict(zip(names_to_values.keys(), metric_values.values()))
     # content = '%s\t\r\nTEST %s Accuracy: %f\t\r\b\t\r\n' % (checkpoint_path, log, names_to_values['accuracy'])
     # with open(logdir + '/eval.txt', 'ab+') as fp:

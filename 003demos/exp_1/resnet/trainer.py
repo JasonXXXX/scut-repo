@@ -11,6 +11,7 @@ flags = tf.app.flags
 flags.DEFINE_string('logdir', None, 'Log directory of this experiment.')
 flags.DEFINE_string('noise', None, 'Noise of this experiment.')
 flags.DEFINE_string('training', None, 'To tell that if need to update the params of resnet.')
+flags.DEFINE_string('extend', None, 'To tell that if need to restore formal model params.')
 FLAGS = flags.FLAGS
 
 
@@ -21,14 +22,14 @@ def main(_):
         exit()
     is_training = True
     batch_size = 32
-    logdir = './hand-written_number/trainer_' + log
+    logdir = './hand-written_number/trainer_' + log + ('' if not FLAGS.noise else ('_noise%s' % FLAGS.noise))
     if log == 'mnist':
         epoch = 4000
         num_samples = 60000
         batch_size = 64
         record_path = './records/mnist_28x28_60000.record'
     elif log == 'usps':
-        epoch = 2000
+        epoch = 4000
         num_samples = 500
         record_path = './records/usps_28x28_500.record'
     elif log == 'both':
@@ -44,8 +45,6 @@ def main(_):
     else:
         print('logdir arguement must be [mnist|usps|both|steps]')
         exit()
-    if not FLAGS.noise:
-        logdir += '_noise%s' % FLAGS.noise
 
     dataset = util.get_record_dataset(record_path, num_samples=num_samples, image_shape=[28, 28, 1])
     data_provider = slim.dataset_data_provider.DatasetDataProvider(dataset)
@@ -71,11 +70,14 @@ def main(_):
     optimizer = tf.train.AdamOptimizer(learning_rate=0.0001)
     train_op = slim.learning.create_train_op(loss, optimizer, summarize_gradients=True)
 
-    if log == 'steps':
+    if log == 'steps' or FLAGS.extend == 'yes':
+        model_path = tf.train.latest_checkpoint(logdir + '/2000')
         variables_to_restore = slim.get_variables_to_restore()
-        init_fn = slim.assign_from_checkpoint_fn(logdir + '/checkpoint',
+        init_fn = slim.assign_from_checkpoint_fn(model_path,
                                                 variables_to_restore,
                                                 ignore_missing_vars=True)
+        print(model_path, 'restored.')
+        sys.stdout.flush()
     else:
         init_fn = None
 
