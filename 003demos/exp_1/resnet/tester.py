@@ -15,6 +15,7 @@ flags = tf.app.flags
 
 flags.DEFINE_string('logdir', None, 'Log directory of this experiment.')
 flags.DEFINE_string('noise', None, 'Noise of this experiment. e.g. 20 means 20%')
+flags.DEFINE_string('once', None, 'If only test once')
 FLAGS = flags.FLAGS
 
 
@@ -28,6 +29,7 @@ def main(_):
     logdir = './hand-written_number/test_' + log
     # this is where we restore the model, meaning we use the trained model
     checkpoint_path = './hand-written_number/trainer_' + log + '' if not FLAGS.noise else ('_noise%s' % FLAGS.noise)
+    # checkpoint_path = tf.train.latest_checkpoint('./hand-written_number/trainer_mnist')
 
     dataset = util.get_record_dataset(record_path, num_samples=num_samples, image_shape=[28, 28, 1])
     data_provider = slim.dataset_data_provider.DatasetDataProvider(dataset)
@@ -54,22 +56,26 @@ def main(_):
 
     names_to_values, names_to_updates = slim.metrics.aggregate_metric_map({
         'accuracy': slim.metrics.streaming_accuracy(postprocessed_dict['classes'], labels),
-        # 'eval/Recall@5': slim.metrics.streaming_recall_at_k(logits, labels, 5),
     })
 
     # evaluate the model with data from record file
     tf.train.get_or_create_global_step()
-    metric_values = slim.evaluation.evaluation_loop(master='',
-                                        checkpoint_dir=checkpoint_path,
-                                        logdir=logdir,
-                                        num_evals=5,
-                                        max_number_of_evaluations=6000,
-                                        eval_interval_secs=40,
-                                        # eval_op=names_to_updates.values(),
-                                        summary_op=tf.summary.merge(summary_ops),
-                                        # final_op=names_to_values
-    )
-    names_to_values = dict(zip(names_to_values.keys(), metric_values.values()))
+    if not FLAGS.once:
+        metric_values = slim.evaluation.evaluation_loop(master='',
+                                            checkpoint_dir=checkpoint_path,
+                                            logdir=logdir,
+                                            num_evals=5,
+                                            max_number_of_evaluations=6000,
+                                            eval_interval_secs=40,
+                                            summary_op=tf.summary.merge(summary_ops),
+        )
+    else:
+        metric_values = slim.evaluation.evaluate_once(master='',
+                                            checkpoint_path=checkpoint_path,
+                                            logdir=logdir,
+                                            summary_op=tf.summary.merge(summary_ops),
+        )
+    # names_to_values = dict(zip(names_to_values.keys(), metric_values.values()))
     # content = '%s\t\r\nTEST %s Accuracy: %f\t\r\b\t\r\n' % (checkpoint_path, log, names_to_values['accuracy'])
     # with open(logdir + '/eval.txt', 'ab+') as fp:
     #     fp.write(content.encode())

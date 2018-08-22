@@ -38,7 +38,7 @@ def main(_):
         batch_size = 64
         record_path = './records/both_28x28_60500.record' if not FLAGS.noise else ('./records/both_28x28_noise%s_60500.record' % FLAGS.noise)
     elif log == 'steps':
-        epoch = 1000 # 因为这里只是训练最后的全连接层，所以训练次数不用太多
+        epoch = 5000 # 因为这里只是训练最后的全连接层，所以训练次数不用太多
         num_samples = 500
         record_path = './records/usps_28x28_500.record'
         is_training = False # 冻结 resnet 的层，只训练最后一层的全连接层
@@ -71,12 +71,12 @@ def main(_):
     train_op = slim.learning.create_train_op(loss, optimizer, summarize_gradients=True)
 
     if log == 'steps' or FLAGS.extend == 'yes':
-        model_path = tf.train.latest_checkpoint(logdir + '/2000')
+        restore_dir = tf.train.latest_checkpoint('./hand-written_number/trainer_mnist')
         variables_to_restore = slim.get_variables_to_restore()
-        init_fn = slim.assign_from_checkpoint_fn(model_path,
+        init_fn = slim.assign_from_checkpoint_fn(restore_dir,
                                                 variables_to_restore,
                                                 ignore_missing_vars=True)
-        print(model_path, 'restored.')
+        print(restore_dir, 'restored.')
         sys.stdout.flush()
     else:
         init_fn = None
