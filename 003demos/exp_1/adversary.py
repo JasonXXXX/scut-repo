@@ -3,14 +3,14 @@ import sys
 import numpy as np
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
-print('\n\nAbout to load mnist data ...')
+print('\nAbout to load mnist data ...')
 Mnist_dir = './datasets/mnist/gzs/'
 mnist = input_data.read_data_sets(Mnist_dir)
 x_train = mnist.train.images
 y_train = mnist.train.labels
 
 EPSILON = 0.01
-SAMPLE_SIZE = 1000 # 总数有 10000 个攻击样本
+SAMPLE_SIZE = 5 # 总数有 10000 个攻击样本
 
 Normal_META_GRAPH = './resnet/hand-written_number/trainer_mnist/model.ckpt-4000.meta'
 Normal_CKPT = './resnet/hand-written_number/trainer_mnist'
@@ -132,7 +132,7 @@ def Make_All_Advesarial(input_class):
 				x_feed[j] = x_feed[j] - (EPSILON * (np.sign(grads_)))
 				x_feed[j] = np.clip(x_feed[j], 0, 1.)
 				i += 1
-				if i % 200 == 0:
+				if i % 100 == 0:
 					print(i, 'times fail now.')
 					sys.stdout.flush()
 			print('sample ', j, 'has been constructed.')
@@ -204,5 +204,6 @@ def Make_Adverial(input_class, target_class):
 
 if __name__ == '__main__':
 	True_Lalbe_Arrye = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-	for true_label in True_Lalbe_Arrye:
-		Make_All_Advesarial(true_label)
+	for i in range(20):
+		for true_label in True_Lalbe_Arrye:
+			Make_All_Advesarial(true_label)
