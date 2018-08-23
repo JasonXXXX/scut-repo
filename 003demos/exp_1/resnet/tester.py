@@ -26,9 +26,9 @@ def main(_):
         print('logdir arguement is required! could be [usps|both|steps]')
         exit()
     record_path = './records/usps_28x28_800.record' # record file contains data
-    logdir = './hand-written_number/test_' + log
+    logdir = './hand-written_number/test_' + log + ('' if not FLAGS.noise else ('_noise%s' % FLAGS.noise))
     # this is where we restore the model, meaning we use the trained model
-    checkpoint_path = './hand-written_number/trainer_' + log + '' if not FLAGS.noise else ('_noise%s' % FLAGS.noise)
+    checkpoint_path = './hand-written_number/trainer_' + log + ('' if not FLAGS.noise else ('_noise%s' % FLAGS.noise))
     # checkpoint_path = tf.train.latest_checkpoint('./hand-written_number/trainer_mnist')
 
     dataset = util.get_record_dataset(record_path, num_samples=num_samples, image_shape=[28, 28, 1])
@@ -61,6 +61,8 @@ def main(_):
     # evaluate the model with data from record file
     tf.train.get_or_create_global_step()
     if not FLAGS.once:
+        print('do evaluation loop. and checkpoint_path:', checkpoint_path)
+        sys.stdout.flush()
         metric_values = slim.evaluation.evaluation_loop(master='',
                                             checkpoint_dir=checkpoint_path,
                                             logdir=logdir,
@@ -70,6 +72,9 @@ def main(_):
                                             summary_op=tf.summary.merge(summary_ops),
         )
     else:
+        checkpoint_path = tf.train.latest_checkpoint(checkpoint_path)
+        print('do evaluation once. and checkpoint_path:', checkpoint_path)
+        sys.stdout.flush()
         metric_values = slim.evaluation.evaluate_once(master='',
                                             checkpoint_path=checkpoint_path,
                                             logdir=logdir,

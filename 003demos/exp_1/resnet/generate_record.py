@@ -62,7 +62,7 @@ def create_tf_example(image_path):
     encoded_png_io = io.BytesIO(encoded_png)
     image = Image.open(encoded_png_io)
     width, height = image.size
-    label = label_dict[image_path.split('/')[-1].split('_')[0]]
+    label = label_dict[image_path.split('/')[-1].split('.')[-2]]
 
     tf_example = tf.train.Example(
         features=tf.train.Features(feature={
@@ -99,9 +99,9 @@ def generate_tfrecord(image_paths, output_path):
 
 
 def main(_):
-    images_record_path = './records/mnist_28x28_poison_4500.record'
+    images_record_path = './records/mnist_28x28_noise10_60000.record'
 
-    images_path = '../datasets/mnist/Ad_image'
+    images_path = '../datasets/mnist/train28-noise10'
     mnist_paths = [images_path + '/' + path for path in os.listdir(images_path)]
 
     random.shuffle(mnist_paths)

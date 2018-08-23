@@ -50,18 +50,26 @@ def get_record_dataset(record_path,
 
 
 if __name__ == '__main__':
-    files = [file for file in os.listdir('../datasets/mnist/train28-noise20')]
+    label_dict = {
+        '0': '8',
+        '1': '4',
+        '2': '7',
+        '3': '9',
+        '4': '6',
+        '5': '3',
+        '6': '4',
+        '7': '1',
+        '8': '2',
+        '9': '0'
+    }
+    files = [file for file in os.listdir('../datasets/mnist/train28-noise10')]
     files_count = len(files) # 60000
     numbers = [i for i in range(files_count)]
     random.shuffle(numbers)
-    for i in range(int(files_count * 0.2)):
+    for i in range(int(files_count * 0.1)):
         file = files[numbers[i]]
         seps = file.split('.')
-        true_label = int(seps[-2])
-        fault_label = true_label
-        while true_label == fault_label:
-            fault_label = random.randint(0, 9)
-        seps[-2] = str(fault_label)
+        seps[-2] = label_dict[seps[-2]]
         filename = '.'.join(seps)
-        os.rename('../datasets/mnist/train28-noise20/' + file, '../datasets/mnist/train28-noise20/' + filename)
+        os.rename('../datasets/mnist/train28-noise10/' + file, '../datasets/mnist/train28-noise10/' + filename)
         print(i, file, 'rename to', filename)
